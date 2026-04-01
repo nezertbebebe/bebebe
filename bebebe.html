@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>для Карины</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #ffeef2;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        #container {
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            color: #d63384;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        #yesBtn {
+            background-color: #4CAF50;
+            color: white;
+            z-index: 100; /* Кнопка ДА всегда сверху */
+        }
+
+        #noBtn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        #result {
+            display: none;
+        }
+
+        #result img {
+            max-width: 80%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="container">
+        <div id="questionArea">
+            <h1>Are you be my valentine?</h1>
+            <div class="buttons">
+                <button id="yesBtn">Да</button>
+                <button id="noBtn">Нет</button>
+            </div>
+        </div>
+
+        <div id="result">
+            <h1>Ура! ❤️</h1>
+            <img src="https://cdn.discordapp.com/attachments/1259171180443734140/1488718076420554894/IMG_20260401_065358_883.jpg?ex=69cdcc40&is=69cc7ac0&hm=648e9485cfd0e184e10336adce98465575d0e51d74de8cc74ddc15603a11a103&" alt="Valentine">
+        </div>
+    </div>
+
+    <script>
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const questionArea = document.getElementById('questionArea');
+        const result = document.getElementById('result');
+
+        let scale = 1;
+
+        // Логика кнопки "Нет"
+        noBtn.addEventListener('click', () => {
+            scale += 0.5; // Увеличиваем размер на 50% каждый раз
+            yesBtn.style.transform = `scale(${scale})`;
+            
+            // Если кнопка становится слишком большой, можно сдвинуть ее в центр
+            if (scale > 5) {
+                noBtn.style.opacity = "0";
+                noBtn.style.pointerEvents = "none";
+            }
+        });
+
+        // Логика кнопки "Да"
+        yesBtn.addEventListener('click', () => {
+            questionArea.style.display = 'none';
+            result.style.display = 'block';
+            
+            // Запуск конфетти
+            const duration = 5 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+              return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function() {
+              const timeLeft = animationEnd - Date.now();
+
+              if (timeLeft <= 0) {
+                return clearInterval(interval);
+              }
+
+              const particleCount = 50 * (timeLeft / duration);
+              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        });
+    </script>
+</body>
+</html>
