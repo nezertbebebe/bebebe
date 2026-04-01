@@ -2,39 +2,39 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>для Карины</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>For My Karina</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body {
             margin: 0;
-            padding: 0;
+            height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
             background-color: #ffeef2;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             overflow: hidden;
-            text-align: center;
+            touch-action: none; /* Важно для мобилок, чтобы кнопка не тупила */
         }
 
         #container {
-            position: relative;
+            text-align: center;
             z-index: 10;
+        }
+
+        .main-img {
+            max-width: 180px;
+            border-radius: 20px;
+            margin-bottom: 20px;
         }
 
         h1 {
             color: #d63384;
-            font-size: 2.5rem;
-            margin-bottom: 30px;
-        }
-
-        .buttons {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
+            font-size: 2rem;
+            margin-bottom: 40px;
+            padding: 0 20px;
         }
 
         button {
@@ -43,29 +43,33 @@
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s ease;
         }
 
         #yesBtn {
-            background-color: #4CAF50;
+            background-color: #ff4d6d;
             color: white;
-            z-index: 100; /* Кнопка ДА всегда сверху */
+            position: relative;
+            z-index: 100;
         }
 
         #noBtn {
-            background-color: #f44336;
+            background-color: #a0a0a0;
             color: white;
+            position: absolute;
+            /* Начальная позиция - внизу справа */
+            right: 50px;
+            bottom: 50px;
+            z-index: 99;
+            transition: all 0.2s ease;
         }
 
         #result {
             display: none;
-        }
-
-        #result img {
-            max-width: 80%;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            margin-top: 20px;
+            font-size: 2.5rem;
+            color: #d63384;
+            font-weight: bold;
+            text-align: center;
         }
     </style>
 </head>
@@ -73,18 +77,15 @@
 
     <div id="container">
         <div id="questionArea">
+            <img src="bebebe.png" alt="Cute" class="main-img">
             <h1>Are you be my valentine?</h1>
-            <div class="buttons">
-                <button id="yesBtn">Да</button>
-                <button id="noBtn">Нет</button>
-            </div>
+            <button id="yesBtn">Да</button>
         </div>
 
-        <div id="result">
-            <h1>Ура! ❤️</h1>
-            <img src="https://cdn.discordapp.com/attachments/1259171180443734140/1488718076420554894/IMG_20260401_065358_883.jpg?ex=69cdcc40&is=69cc7ac0&hm=648e9485cfd0e184e10336adce98465575d0e51d74de8cc74ddc15603a11a103&" alt="Valentine">
-        </div>
+        <div id="result">Ураааа! Люблю тебя ❤️</div>
     </div>
+
+    <button id="noBtn">Нет</button>
 
     <script>
         const yesBtn = document.getElementById('yesBtn');
@@ -93,44 +94,55 @@
         const result = document.getElementById('result');
 
         let scale = 1;
+        let phraseIndex = 0;
 
-        // Логика кнопки "Нет"
-        noBtn.addEventListener('click', () => {
-            scale += 0.5; // Увеличиваем размер на 50% каждый раз
-            yesBtn.style.transform = `scale(${scale})`;
+        const phrases = [
+            "Ты уверена?", "Прям точно?", "Подумай еще разок!", "Может передумаешь?", 
+            "Я же обижусь! :( ", "Ну пожалуйстааа", "Сердце разбито 💔", 
+            "Кнопка 'Нет' сломалась!", "Я буду спамить тебе!", "Ай, больно!", 
+            "Ты просто стесняешься?", "Не верю!", "У меня лапки!", 
+            "Бе-бе-бе, не попала!", "Лови меня!", "Мимо!", "Слишком медленно!",
+            "Просто нажми ДА и всё!"
+        ];
+
+        function moveButton() {
+            // Рассчитываем случайные координаты так, чтобы кнопка не уходила за края экрана
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 20);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 20);
             
-            // Если кнопка становится слишком большой, можно сдвинуть ее в центр
-            if (scale > 5) {
-                noBtn.style.opacity = "0";
-                noBtn.style.pointerEvents = "none";
-            }
+            noBtn.style.right = 'auto';
+            noBtn.style.bottom = 'auto';
+            noBtn.style.left = x + 'px';
+            noBtn.style.top = y + 'px';
+
+            // Меняем текст
+            noBtn.innerText = phrases[phraseIndex];
+            phraseIndex = (phraseIndex + 1) % phrases.length;
+
+            // Увеличиваем "Да"
+            scale += 0.25;
+            yesBtn.style.transform = `scale(${scale})`;
+        }
+
+        // Обработка клика и наведения для "Нет"
+        noBtn.addEventListener('mouseover', moveButton);
+        noBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            moveButton();
         });
 
-        // Логика кнопки "Да"
+        // Клик на "Да"
         yesBtn.addEventListener('click', () => {
             questionArea.style.display = 'none';
+            noBtn.style.display = 'none'; // Скрываем убегающую кнопку
             result.style.display = 'block';
             
-            // Запуск конфетти
-            const duration = 5 * 1000;
-            const animationEnd = Date.now() + duration;
-            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-
-            function randomInRange(min, max) {
-              return Math.random() * (max - min) + min;
-            }
-
-            const interval = setInterval(function() {
-              const timeLeft = animationEnd - Date.now();
-
-              if (timeLeft <= 0) {
-                return clearInterval(interval);
-              }
-
-              const particleCount = 50 * (timeLeft / duration);
-              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
-              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
-            }, 250);
+            confetti({
+                particleCount: 200,
+                spread: 100,
+                origin: { y: 0.6 },
+                colors: ['#ff4d6d', '#d63384', '#ffffff']
+            });
         });
     </script>
 </body>
